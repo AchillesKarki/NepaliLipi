@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Next Word Prediction</title>
+
+  <script src="jquery-3.3.1.min.js"></script>
+  <script src="shared/jquery.js" type="text/javascript"></script>
+  <script src="shared/shiny.js" type="text/javascript"></script>
+  <script src="jquery-ui.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="shared/shiny.css" />
+  <link rel="stylesheet" type="text/css" href="jquery-ui.css" />
+  <style>
+    textarea {
+      font-size: 26px;
+      letter-spacing: 0.08em;
+      padding-left: 5px;
+    }
+
+    input {
+      font-size: 26px;
+    }
+
+    body {
+      margin: 0;
+      position: relative;
+      background: rgba(128,128,128,0.3);
+      letter-spacing: 0.09em;
+    }
+
+    h1 {
+      font-size: 48px;
+      text-align: center;
+    }
+
+    p {
+      font-size: 18px;
+    }
+
+    #ngram {
+      margin-bottom: 250px;
+    }
+
+    .footer {
+      margin: 0px;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding: 1rem;
+      background: rgba(128,128,128,0.8);
+      text-align: center;
+    }
+
+    #container{
+      padding: 20px;
+      text-align: center;
+    }
+
+    #ngramp{
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <script>
+    Shiny.addCustomMessageHandler("myCallbackHandler",
+      function (availableTags) {
+
+        function split(val) {
+          return val.split(/\s+/);
+        }
+
+        function extractLast(term) {
+          return split(term).pop();
+        }
+
+        $('[name=phrase]')
+          // don't navigate away from the field on tab when selecting an item
+          .bind("keydown", function (event) {
+            if (event.keyCode === $.ui.keyCode.TAB &&
+              $(this).autocomplete("instance").menu.active) {
+              event.preventDefault();
+            }
+          })
+          .autocomplete({
+            minLength: 0,
+            source: function (request, response) {
+              // delegate back to autocomplete, but extract the last term
+              response($.ui.autocomplete.filter(
+                availableTags, extractLast(request.term)));
+            },
+            focus: function () {
+              // prevent value inserted on focus
+              return false;
+            },
+            select: function (event, ui) {
+              var terms = split(this.value);
+              // remove the current input
+              terms.pop();
+              // add the selected item
+              terms.push(ui.item.value);
+              // add placeholder to get the comma-and-space at the end
+              terms.push("");
+              this.value = terms.join(" ");
+              return false;
+            }
+          }).autocomplete("search", "");
+      });
+  </script>
+</head>
+
+<body>
+  <div id="container">
+    <H1>नेपाली लिपि</H1>
+    <h2>अंग्रेजी देखि नेपाली रुपान्तरण:</h2>
+    <p>यहाँ अंग्रेजी मा टाइप गर्नुहोस, हाम्रो एप्लिकेसन ले त्यसलाई स्वयम् नेपालीमा रुपान्तरण गर्दिनेछ |
+      <br>उदाहरणहरु:
+      <br>"namaste" : "नमस्ते"
+      <br>"himaalaya kalej af injiniyariNg": "हिमालय कलेज अफ इन्जिनियरिंग"
+    </p>
+    <div>
+      <div class="input-wrp">
+        <textarea id="english" onkeyup="keyPressed()" placeholder="टाइप गर्नुहोस" rows="2" cols="60"></textarea>
+      </div>
+      <div class="output-wrp">
+        <textarea id="output" rows="2" cols="60" readonly></textarea>
+      </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <br>
+    <br>
+    <div class="ui-widget" id="ngram">
+      <h2>NGRAM अल्गोरिदम:</h2>
+      <p id="ngramp">यस अल्गोरिदम को मद्दत ले हामीले लेख्न खोजिएको शब्द अनुमान गर्छौं | साथै त्यो शब्द पछि अर्को कुन शब्द उपयुक्त हुन्छ, हामी त्यसलाई पनि अनुमान गर्छौं | </p>
+      <textarea type="text" name="phrase" value="" rows="1" cols="60"></textarea>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>&copy;नेपालीलिपि (2017-2018). All Rights Reserved</p>
+    <p>हिमालय कलेज अफ इन्जिनियरिंग</p>
+    <p>अशिम कार्की</p>
+    <p>बिक्कल शर्मा</p>
+    <p>अरुन पान्डे</p>
+    <p>बिबेक पोखरेल</p>
+  </div>
+  <!-- <div id="table" class="shiny-html-output"></div>
+  <pre id="time" class="shiny-text-output"></pre> -->
+  <script type="text/javascript" src="js/InputClass.js"></script>
+  <script type="text/javascript" src="js/Unicode.js"></script>
+  <script type="text/javascript" src="js/Operation.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+</body>
+
+</html>
