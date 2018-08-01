@@ -1,0 +1,12 @@
+name: nepalilipi
+title:
+username:
+account: achilles
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 393125
+bundleId: 1511528
+url: https://achilles.shinyapps.io/nepalilipi/
+when: 1533130064.86762
+asMultiple: FALSE
+asStatic: FALSE
