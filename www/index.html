@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Next Word Prediction</title>
-  <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nepali Lipi</title>
+  <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
   <script src="jquery-3.3.1.min.js"></script>
   <script src="shared/jquery.js" type="text/javascript"></script>
   <script src="shared/shiny.js" type="text/javascript"></script>
@@ -19,14 +20,10 @@
       padding-left: 5px;
     }
 
-    input {
-      font-size: 26px;
-    }
-
     body {
       margin: 0;
       position: relative;
-      background: rgba(128,128,128,0.3);
+      background: rgba(128, 128, 128, 0.3);
       letter-spacing: 0.09em;
     }
 
@@ -36,7 +33,7 @@
     }
 
     p {
-      font-size: 18px;
+      font-size: 20px;
     }
 
     #ngram {
@@ -49,82 +46,435 @@
       bottom: 0;
       left: 0;
       padding: 1rem;
-      background: rgba(128,128,128,0.8);
+      background: rgba(128, 128, 128, 0.8);
       text-align: center;
     }
 
-    #container{
+    #container {
       padding: 20px;
       text-align: center;
     }
 
-    #ngramp{
+    #ngramp {
       margin-bottom: 10px;
     }
+
+    #hintButtonDiv {
+      position: absolute;
+      right: 10%;
+    }
+
+    /* Popup container - can be anything you want */
+
+    .popup {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* The actual popup */
+
+    .popup .popuptext {
+      visibility: hidden;
+      width: 400px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px 0;
+      position: absolute;
+      z-index: 1;
+      top: 125%;
+      right: 50%;
+      margin-left: -80px;
+    }
+
+    /* Popup arrow */
+
+    /* .popup .popuptext::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    } */
+
+    /* Toggle this class - hide and show the popup */
+
+    .popup .show {
+      visibility: visible;
+      -webkit-animation: fadeIn 1s;
+      animation: fadeIn 1s;
+    }
+
+    /* Add animation (fade in the popup) */
+
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .inline {
+      display: inline;
+    }
   </style>
+</head>
+<script>
+  Shiny.addCustomMessageHandler("myCallbackHandler",
+    function (availableTags) {
 
-  <script>
-    Shiny.addCustomMessageHandler("myCallbackHandler",
-      function (availableTags) {
+      function split(val) {
+        return val.split(/\s+/);
+      }
 
-        function split(val) {
-          return val.split(/\s+/);
-        }
+      function extractLast(term) {
+        return split(term).pop();
+      }
 
-        function extractLast(term) {
-          return split(term).pop();
-        }
-
-        $('[name=phrase]')
-          // don't navigate away from the field on tab when selecting an item
-          .bind("keydown", function (event) {
-            if (event.keyCode === $.ui.keyCode.TAB &&
-              $(this).autocomplete("instance").menu.active) {
-              event.preventDefault();
-            }
-          })
-          .autocomplete({
-            minLength: 0,
-            source: function (request, response) {
-              // delegate back to autocomplete, but extract the last term
-              response($.ui.autocomplete.filter(
-                availableTags, extractLast(request.term)));
-            },
-            focus: function () {
-              // prevent value inserted on focus
-              return false;
-            },
-            select: function (event, ui) {
-              var terms = split(this.value);
-              // remove the current input
-              terms.pop();
-              // add the selected item
-              terms.push(ui.item.value);
-              // add placeholder to get the comma-and-space at the end
-              terms.push("");
-              this.value = terms.join(" ");
-              return false;
-            }
-          }).autocomplete("search", "");
-      });
-  </script>
+      $('[name=phrase]')
+        // don't navigate away from the field on tab when selecting an item
+        .bind("keydown", function (event) {
+          if (event.keyCode === $.ui.keyCode.TAB &&
+            $(this).autocomplete("instance").menu.active) {
+            event.preventDefault();
+          }
+        })
+        .autocomplete({
+          minLength: 0,
+          source: function (request, response) {
+            // delegate back to autocomplete, but extract the last term
+            response($.ui.autocomplete.filter(
+              availableTags, extractLast(request.term)));
+          },
+          focus: function () {
+            // prevent value inserted on focus
+            return false;
+          },
+          select: function (event, ui) {
+            var terms = split(this.value);
+            // remove the current input
+            terms.pop();
+            // add the selected item
+            terms.push(ui.item.value);
+            // add placeholder to get the comma-and-space at the end
+            terms.push("");
+            this.value = terms.join(" ");
+            return false;
+          }
+        }).autocomplete("search", "");
+    });
+</script>
 </head>
 
 <body>
   <div id="container">
     <H1>नेपाली लिपि</H1>
     <h2>अंग्रेजी देखि नेपाली रुपान्तरण:</h2>
-    <p>यहाँ अंग्रेजी मा टाइप गर्नुहोस, हाम्रो एप्लिकेसन ले त्यसलाई स्वयम् नेपालीमा रुपान्तरण गर्दिनेछ |
+    <h2>English to Nepali Transliteration:</h2>
+    <p>यहाँ अंग्रेजी मा टाईप गर्नुहोस, हाम्रो एप्लिकेसन ले त्यसलाई स्वयम् नेपालीमा रुपान्तरण गर्दिनेछ |
       <br>उदाहरणहरु:
       <br>"namaste" : "नमस्ते"
-      <br>"himaalaya kalej af injiniyariNg": "हिमालय कलेज अफ इन्जिनियरिंग"
+      <br>"himaalaya kalej af injiniyariNg": "हिमालय कलेज अफ इन्जिनियरिङ्"
     </p>
+    <p>
+      <strong>"Hint" मा थिची, रुपान्तरणको नियमहरु हेर्न सक्नु हुनेछ</strong>
+    </p>
+    <div id="hintButtonDiv">
+      <button class="popup" onclick="myFunction()">Hint
+        <span class="popuptext" id="myPopup">
+          <div class="inline">
+            <table>
+              <tr>
+                <td> </td>
+                <td>a : </td>
+                <td>अ,</td>
+                <td> </td>
+                <td>ka : </td>
+                <td>क,</td>
+                <td> </td>
+                <td>Ta : </td>
+                <td>ट,</td>
+                <td> </td>
+                <td>pa : </td>
+                <td>प,</td>
+                <td> </td>
+                <td>shha : </td>
+                <td>ष,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>ka : </td>
+                <td>क</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>aa : </td>
+                <td>आ,</td>
+                <td> </td>
+                <td>kha : </td>
+                <td>ख,</td>
+                <td> </td>
+                <td>Tha : </td>
+                <td>ठ,</td>
+                <td> </td>
+                <td>pha : </td>
+                <td>फ,</td>
+                <td> </td>
+                <td>sa : </td>
+                <td>स,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>kaa : </td>
+                <td>का</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>i : </td>
+                <td>इ,</td>
+                <td> </td>
+                <td>ga : </td>
+                <td>ग,</td>
+                <td> </td>
+                <td>Da : </td>
+                <td>ड,</td>
+                <td> </td>
+                <td>ba : </td>
+                <td>ब,</td>
+                <td> </td>
+                <td>ha : </td>
+                <td>ह,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>ki : </td>
+                <td>कि</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>ii : </td>
+                <td>ई,</td>
+                <td> </td>
+                <td>gha : </td>
+                <td>घ,</td>
+                <td> </td>
+                <td>Dha : </td>
+                <td>ढ,</td>
+                <td> </td>
+                <td>bha : </td>
+                <td>भ,</td>
+                <td> </td>
+                <td>tra : </td>
+                <td>त्र,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>kii : </td>
+                <td>की</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>u : </td>
+                <td>उ,</td>
+                <td> </td>
+                <td>Nga : </td>
+                <td>ङ,</td>
+                <td> </td>
+                <td>Na : </td>
+                <td>ण,</td>
+                <td> </td>
+                <td>ma</td>
+                <td>म,</td>
+                <td> </td>
+                <td>* : </td>
+                <td>ँ,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>ku : </td>
+                <td>कु</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>uu : </td>
+                <td>ऊ,</td>
+                <td> </td>
+                <td>cha : </td>
+                <td>च,</td>
+                <td> </td>
+                <td>ta : </td>
+                <td>त,</td>
+                <td> </td>
+                <td>ya : </td>
+                <td>य,</td>
+                <td> </td>
+                <td>^ : </td>
+                <td>ं,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>kuu : </td>
+                <td>कू</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>e : </td>
+                <td>ए,</td>
+                <td> </td>
+                <td>chha : </td>
+                <td>छ,</td>
+                <td> </td>
+                <td>tha : </td>
+                <td>थ,</td>
+                <td> </td>
+                <td>ra : </td>
+                <td>र,</td>
+                <td> </td>
+                <td>. : </td>
+                <td>|,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>ke : </td>
+                <td>के</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>ai : </td>
+                <td>ऐ,</td>
+                <td> </td>
+                <td>ja : </td>
+                <td>ज,</td>
+                <td> </td>
+                <td>da : </td>
+                <td>द,</td>
+                <td> </td>
+                <td>la : </td>
+                <td>ल,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>kai : </td>
+                <td>कै</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>o : </td>
+                <td>ओ,</td>
+                <td> </td>
+                <td>jha : </td>
+                <td>झ,</td>
+                <td> </td>
+                <td>dha : </td>
+                <td>ध,</td>
+                <td> </td>
+                <td>va : </td>
+                <td>व,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>ko : </td>
+                <td>काे</td>
+              </tr>
+              <tr>
+                <td> </td>
+                <td>au : </td>
+                <td>औ,</td>
+                <td> </td>
+                <td>Yna : </td>
+                <td>ञ,</td>
+                <td> </td>
+                <td>na : </td>
+                <td>न,</td>
+                <td> </td>
+                <td>sha : </td>
+                <td>श,</td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>kau : </td>
+                <td>काै</td>
+              </tr>
+            </table>
+          </div>
+        </span>
+      </button>
+    </div>
     <div>
       <div class="input-wrp">
-        <textarea id="english" onkeyup="keyPressed()" placeholder="टाइप गर्नुहोस" rows="2" cols="60"></textarea>
+        <textarea id="english" onkeyup="keyPressed()" placeholder="टाईप गर्नुहोस Please Type Here" rows="4" cols="60"></textarea>
       </div>
       <div class="output-wrp">
-        <textarea id="output" rows="2" cols="60" readonly></textarea>
+        <textarea id="output" rows="4" cols="60" readonly></textarea>
       </div>
     </div>
     <br>
@@ -135,26 +485,34 @@
     <br>
     <br>
     <div class="ui-widget" id="ngram">
-      <h2>NGRAM अल्गोरिदम:</h2>
-      <p id="ngramp">यस अल्गोरिदम को मद्दत ले हामीले लेख्न खोजिएको शब्द अनुमान गर्छौं | साथै त्यो शब्द पछि अर्को कुन शब्द उपयुक्त हुन्छ, हामी त्यसलाई पनि अनुमान गर्छौं | </p>
-      <textarea type="text" name="phrase" value="" rows="1" cols="60"></textarea>
+      <h2>शब्द स्वतःपूरा/अनुमान/सिक्ने (auto-complete/recommendation/prediction/learning)</h2>
+      <p id="ngramp">NGRAM अल्गोरिदम (NGRAM Algorithm), मार्को सिद्धान्त (Markov's Chain Rule Principle) र ब्याक अफ् अल्गोरिदम (Backoff
+        Algorithm) को मद्दत ले हामीले लेख्न खोजिएको शब्द अनुमान गर्छौं | साथै त्यो शब्द पछि अर्को कुन शब्द उपयुक्त हुन्छ,
+        हामी त्यसलाई पनि अनुमान गर्छौं | यदि तपाईले लेख्न खोज्नु भएको शब्द /वाक्यांश हाम्रो शब्दकोश मा नभएको खण्डमा, हाम्रो
+        एप्लिकेसनले त्यस शब्द /वाक्यांश लाई आफ्नो शब्दकोश मा राखिदिनेछ र अर्को पटक तपाइको लेख्ने व्यवहार अनुसार अनुमान गर्नेछ
+        |</p>
+      <br>
+      <h2>कृपया यहाँ नेपाली मा मात्र टाईप गर्नुहोला (Type here in Nepali)</h2>
+      <textarea type="text" name="phrase" value="" rows="6" cols="80"></textarea>
     </div>
   </div>
 
   <div class="footer">
     <p>&copy;नेपालीलिपि (2017-2018). All Rights Reserved</p>
-    <p>हिमालय कलेज अफ इन्जिनियरिंग</p>
-    <p>अशिम कार्की</p>
-    <p>बिक्कल शर्मा</p>
-    <p>अरुन पान्डे</p>
-    <p>बिबेक पोखरेल</p>
+    <p>Ashim Karki</p>
+  
   </div>
-  <!-- <div id="table" class="shiny-html-output"></div>
-  <pre id="time" class="shiny-text-output"></pre> -->
   <script type="text/javascript" src="js/InputClass.js"></script>
   <script type="text/javascript" src="js/Unicode.js"></script>
   <script type="text/javascript" src="js/Operation.js"></script>
   <script type="text/javascript" src="js/script.js"></script>
+  <script>
+    // When the user clicks on hintButton, open the popup
+    function myFunction() {
+      var popup = document.getElementById("myPopup");
+      popup.classList.toggle("show");
+    }
+  </script>
 </body>
 
 </html>

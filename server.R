@@ -1,11 +1,13 @@
-
 library(shiny)
 library(RWeka)
 library(data.table)
 
 
 options(shiny.maxRequestSize=64*1024^2) 
-load("nGramsLite.RData")
+load("ngram45.RData")
+load("ngram1.RData")
+load("ngram2.RData")
+load("ngram3.RData")
 source("ngramPredictionFunction.R")
 
 
@@ -14,6 +16,9 @@ shinyServer(function(input, output, session) {
   
   observe({
     t1 <- Sys.time()
+    load("ngram1.RData")
+    load("ngram2.RData")
+    load("ngram3.RData")
     input$phrase
     out2 <- ngramPredictionFunction(input$phrase, ngram1, ngram2, ngram3, ngram4, ngram5)
     words <- as.data.frame(out2)[,1]
