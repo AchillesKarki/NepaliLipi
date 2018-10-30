@@ -5,9 +5,8 @@ account: achilles
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 393125
-bundleId: 1672488
+bundleId: 1672501
 url: https://achilles.shinyapps.io/nepalilipi/
-when: 1540921591.20403
+when: 1540921985.28468
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: ngram1.RData|ngram2.RData|ngram3.RData|ngram45.RData|ngramPredictionFunction.R|README.md|server.R|ui.R
