@@ -2,3 +2,4 @@
 *.log
 /rsconnect/
 .gitignore
+.Rproj.user
